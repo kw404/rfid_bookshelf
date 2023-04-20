@@ -1,4 +1,4 @@
 {
     "board": "arduino:avr:uno",
-    "sketch": "RFID_code/RFID_esp32/RFID_esp32.ino"
+    "sketch": "RFID_code\\PN5180_ReadUID_wifi_connect\\PN5180_ReadUID_wifi_connect.ino"
 }
