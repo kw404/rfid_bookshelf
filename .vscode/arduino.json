@@ -1,4 +1,5 @@
 {
-    "board": "arduino:avr:uno",
-    "sketch": "RFID_code\\PN5180_ReadUID_wifi_connect\\PN5180_ReadUID_wifi_connect.ino"
+    "board": "esp32:esp32:esp32wrover",
+    "sketch": "RFID_code\\PN5180_ReadUID_wifi_connect\\PN5180_ReadUID_wifi_connect.ino",
+    "configuration": "PartitionScheme=huge_app,FlashMode=qio,FlashFreq=80,UploadSpeed=115200,DebugLevel=none"
 }
