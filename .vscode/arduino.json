@@ -1,3 +1,4 @@
 {
-    "board": "arduino:avr:uno"
+    "board": "arduino:avr:uno",
+    "sketch": "RFID_code/RFID_esp32/RFID_esp32.ino"
 }

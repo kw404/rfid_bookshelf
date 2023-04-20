@@ -1,54 +1,54 @@
-// NAME: PN5180-ReadUID.ino
-//
-// DESC: Example usage of the PN5180 library for the PN5180-NFC Module
-//       from NXP Semiconductors.
-//
-// Copyright (c) 2018 by Andreas Trappmann. All rights reserved.
-// Copyright (c) 2019 by Dirk Carstensen.
-//
-// This file is part of the PN5180 library for the Arduino environment.
-//
-// This library is free software; you can redistribute it and/or
-// modify it under the terms of the GNU Lesser General Public 
-// License as published by the Free Software Foundation; either
-// version 2.1 of the License, or (at your option) any later version.
-//
-// This library is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-// Lesser General Public License for more details.
-//
-// BEWARE: SPI with an Arduino to a PN5180 module has to be at a level of 3.3V
-// use of logic-level converters from 5V->3.3V is absolutly neccessary
-// on most Arduinos for all input pins of PN5180!
-// If used with an ESP-32, there is no need for a logic-level converter, since
-// it operates on 3.3V already.
-//
-// Arduino <-> Level Converter <-> PN5180 pin mapping:
-// 5V             <-->             5V
-// 3.3V           <-->             3.3V
-// GND            <-->             GND
-// 5V      <-> HV
-// GND     <-> GND (HV)
-//             LV              <-> 3.3V
-//             GND (LV)        <-> GND
-// SCLK,13 <-> HV1 - LV1       --> SCLK
-// MISO,12        <---         <-- MISO
-// MOSI,11 <-> HV3 - LV3       --> MOSI
-// SS,10   <-> HV4 - LV4       --> NSS (=Not SS -> active LOW)
-// BUSY,9         <---             BUSY
-// Reset,7 <-> HV2 - LV2       --> RST
-//
-// ESP-32    <--> PN5180 pin mapping:
-// 3.3V      <--> 3.3V
-// GND       <--> GND
-// SCLK, 18   --> SCLK
-// MISO, 19  <--  MISO
-// MOSI, 23   --> MOSI
-// SS, 16     --> NSS (=Not SS -> active LOW)
-// BUSY, 5   <--  BUSY
-// Reset, 17  --> RST
-//
+/* NAME: PN5180-ReadUID.ino
+
+DESC: Example usage of the PN5180 library for the PN5180-NFC Module
+      from NXP Semiconductors.
+
+Copyright (c) 2018 by Andreas Trappmann. All rights reserved.
+Copyright (c) 2019 by Dirk Carstensen.
+
+This file is part of the PN5180 library for the Arduino environment.
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public 
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+Lesser General Public License for more details.
+
+BEWARE: SPI with an Arduino to a PN5180 module has to be at a level of 3.3V
+use of logic-level converters from 5V->3.3V is absolutly neccessary
+on most Arduinos for all input pins of PN5180!
+If used with an ESP-32, there is no need for a logic-level converter, since
+it operates on 3.3V already.
+
+Arduino <-> Level Converter <-> PN5180 pin mapping:
+5V             <-->             5V
+3.3V           <-->             3.3V
+GND            <-->             GND
+5V      <-> HV
+GND     <-> GND (HV)
+            LV              <-> 3.3V
+            GND (LV)        <-> GND
+SCLK,13 <-> HV1 - LV1       --> SCLK
+MISO,12        <---         <-- MISO
+MOSI,11 <-> HV3 - LV3       --> MOSI
+SS,10   <-> HV4 - LV4       --> NSS (=Not SS -> active LOW)
+BUSY,9         <---             BUSY
+Reset,7 <-> HV2 - LV2       --> RST
+
+ESP-32    <--> PN5180 pin mapping:
+3.3V      <--> 3.3V
+GND       <--> GND
+SCLK, 18   --> SCLK
+MISO, 19  <--  MISO
+MOSI, 23   --> MOSI
+SS, 16     --> NSS (=Not SS -> active LOW)
+BUSY, 5   <--  BUSY
+Reset, 17  --> RST
+*/
 
 /*
  * Pins on ICODE2 Reader Writer:
