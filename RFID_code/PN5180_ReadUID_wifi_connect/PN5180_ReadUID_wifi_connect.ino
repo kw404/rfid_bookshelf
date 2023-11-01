@@ -62,12 +62,12 @@
 
 #include <HTTPClient.h>
 
-#include <PN5180.h>
-#include <PN5180ISO14443.h>
+// #include <PN5180.h>
+// #include <PN5180ISO14443.h>
 
-#define PN5180_NSS_1  16   
-#define PN5180_BUSY_1 5  
-#define PN5180_RST_1  17
+// #define PN5180_NSS_1  16   
+// #define PN5180_BUSY_1 5  
+// #define PN5180_RST_1  17
 
 //#define PN5180_NSS_2  16   
 //#define PN5180_BUSY_2 5  
@@ -75,42 +75,47 @@
 
 WiFiMulti wifiMulti;
 
-PN5180ISO14443 nfc14443_1(PN5180_NSS_1, PN5180_BUSY_1, PN5180_RST_1);
+// PN5180ISO14443 nfc14443_1(PN5180_NSS_1, PN5180_BUSY_1, PN5180_RST_1);
 //PN5180ISO14443 nfc14443_2(PN5180_NSS_2, PN5180_BUSY_2, PN5180_RST_2);
 
 String laburlkey = "https://zhuan-ti-hou-duan.onrender.com/pushIdTest";
 
+String wifiid = "";
+String wifipw = "";
+
+
 void setup() {
   Serial.begin(115200);
-  Serial.println(F("=================================="));
-  Serial.println(F("Uploaded: " __DATE__ " " __TIME__));
-  Serial.println(F("PN5180 ISO14443 Demo Sketch"));
+  // Serial.println(F("=================================="));
+  // Serial.println(F("Uploaded: " __DATE__ " " __TIME__));
+  // Serial.println(F("PN5180 ISO14443 Demo Sketch"));
 
-  nfc14443_1.begin();
-//  nfc14443_2.begin();
-  for(uint8_t t = 4; t > 0; t--) {
-        Serial.printf("[SETUP] WAIT %d...\n", t);
-        Serial.flush();
-        delay(1000);
-    }
+  // nfc14443_1.begin();
+  // nfc14443_2.begin();
+  // for(uint8_t t = 4; t > 0; t--) {
+  //       Serial.printf("[SETUP] WAIT %d...\n", t);
+  //       Serial.flush();
+  //       delay(1000);
+  //   }
 
-    //wifiMulti.addAP("310_Lab", "TAHRD310");
-    wifiMulti.addAP("wifi_TAHRD-503", "tahrd503");
+  wifiMulti.addAP("310_Lab", "TAHRD310");
+  wifiMulti.addAP("wifi_TAHRD-503", "tahrd503");
+  wifiMulti.addAP(wifiid, wifipw);
 }
 
-uint32_t loopCnt = 0;
+// uint32_t loopCnt = 0;
 
 
 // read cards loop
 void loop() {
-  Serial.println(F("----------------------------------"));
-  Serial.print(F("Loop #"));
-  Serial.println(loopCnt++);
+  // Serial.println(F("----------------------------------"));
+  // Serial.print(F("Loop #"));
+  // Serial.println(loopCnt++);
   #if defined(ARDUINO_ARCH_ESP32)  
     Serial.println("Free heap: " + String(ESP.getFreeHeap())); 
   #endif
-  uint8_t uid[10];
-  String full_uid;
+  // uint8_t uid[10];
+  // String full_uid;
   // check for ISO-14443 card
   nfc14443_1.reset();
   Serial.print(F("ISO14443 card found, UID="));
