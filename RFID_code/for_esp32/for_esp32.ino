@@ -29,7 +29,7 @@ void loop() {
 
   if(wifiMulti.run() == WL_CONNECTED){
     HTTPClient http;
-    http.begin(laburlkey);
+    data = http.begin(laburlkey);
     http.end();
   }
   else{

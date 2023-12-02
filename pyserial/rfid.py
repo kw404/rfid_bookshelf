@@ -43,8 +43,15 @@ last_data = [
     "0x34",
 ]
 time_del = 0
+time_counter = 0
 in_shelf = []
-booklist = [11111111, 22222222, 33333333, 44444444, 55555555]
+booklist = [
+    "AABB00112233445522222222",
+    "AABB00112233445511111111",
+    "AABB00112233445533333333",
+    "AABB00112233445544444444",
+    "AABB00112233445555555555",
+]
 
 try:
     ser.write([0x53, 0x57, 0x00, 0x05, 0xFF, 0x24, 0x05, 0x0B, 0x1E])
@@ -67,7 +74,8 @@ try:
             print(data == last_data)
             print(time_del <= 3)
             if data[27] == last_data[27] and time_del <= 3:
-                timing = time.time()
+                time_counter = time.time() - time_count
+                time_count = timing
             else:
                 last_data = data
                 timing = time.time()
@@ -86,7 +94,7 @@ try:
                 )
                 print(book)
         else:
-            if time.time() - timing > 2 and time_count != 0:
+            if time_counter > 3 and time_count != 0:
                 time_count = 0
                 booknum = int(last_data[27], 0) - 1
                 book = booklist[booknum]
@@ -94,6 +102,6 @@ try:
                     "https://zhuan-ti-hou-duan.onrender.com//bookTouchShelf",
                     data={"book_id": book, "touchedShelf": "A1"},
                 )
-                print(book)
+                print(book, "timeout")
 except KeyboardInterrupt:
     ser.close()
