@@ -1,128 +1,87 @@
-
-/**
-   --------------------------------------------------------------------------------------------------------------------
-   Example sketch/program showing how to read data from more than one PICC to serial.
-   --------------------------------------------------------------------------------------------------------------------
-   This is a MFRC522 library example; for further details and other examples see: https://github.com/miguelbalboa/rfid
-
-   Example sketch/program showing how to read data from more than one PICC (that is: a RFID Tag or Card) using a
-   MFRC522 based RFID Reader on the Arduino SPI interface.
-
-   Warning: This may not work! Multiple devices at one SPI are difficult and cause many trouble!! Engineering skill
-            and knowledge are required!
-
-   @license Released into the public domain.
-
-   Typical pin layout used:
-   -----------------------------------------------------------------------------------------
-               MFRC522      Arduino       Arduino   Arduino    Arduino          Arduino
-               Reader/PCD   Uno/101       Mega      Nano v3    Leonardo/Micro   Pro Micro
-   Signal      Pin          Pin           Pin       Pin        Pin              Pin
-   -----------------------------------------------------------------------------------------
-   RST/Reset   RST          9             5         D9         RESET/ICSP-5     RST
-   SPI SS 1    SDA(SS)      ** custom, take a unused pin, only HIGH/LOW required *
-   SPI SS 2    SDA(SS)      ** custom, take a unused pin, only HIGH/LOW required *
-   SPI MOSI    MOSI         11 / ICSP-4   51        D11        ICSP-4           16
-   SPI MISO    MISO         12 / ICSP-1   50        D12        ICSP-1           14
-   SPI SCK     SCK          13 / ICSP-3   52        D13        ICSP-3           15
-
-*/
-
 #include <SPI.h>
 #include <MFRC522.h>
 
-// PIN Numbers : RESET + SDAs
-#define RST_PIN         9
-#define SS_1_PIN        10
-#define SS_2_PIN        8
-#define SS_3_PIN        7
-#define SS_4_PIN        6
+#define SS_PIN1 2 // 模块1的SDA引脚
+#define RST_PIN1 3 // 模块1的RST引脚
+#define SS_PIN2 4 // 模块2的SDA引脚
+#define RST_PIN2 5 // 模块2的RST引脚
+#define SS_PIN3 6 // 模块3的SDA引脚
+#define RST_PIN3 7 // 模块3的RST引脚
+#define SS_PIN4 8 // 模块4的SDA引脚
+#define RST_PIN4 9 // 模块4的RST引脚
+// #define SS_PIN5 A0 // 模块5的SDA引脚
+// #define RST_PIN5 A1 // 模块5的RST引脚
 
-// Led and Relay PINS
+MFRC522 mfrc522_1(SS_PIN1, RST_PIN1);
+MFRC522 mfrc522_2(SS_PIN2, RST_PIN2);
+MFRC522 mfrc522_3(SS_PIN3, RST_PIN3);
+MFRC522 mfrc522_4(SS_PIN4, RST_PIN4);
+// MFRC522 mfrc522_5(SS_PIN5, RST_PIN5);
 
-// List of Tags UIDs that are allowed to open the puzzle
-byte tagarray[][4] = {
-  {0x4B, 0x17, 0xBC, 0x79},
-  {0x8A, 0x2B, 0xBC, 0x79}, 
-  {0x81, 0x29, 0xBC, 0x79},
-  {0xE6, 0xDF, 0xBB, 0x79},
-};
-
-// Inlocking status :
-
-#define NR_OF_READERS   4
-
-byte ssPins[] = {SS_1_PIN, SS_2_PIN, SS_3_PIN, SS_4_PIN};
-
-// Create an MFRC522 instance :
-MFRC522 mfrc522[NR_OF_READERS];
-
-/**
-   Initialize.
-*/
 void setup() {
-
-  Serial.begin(9600);           // Initialize serial communications with the PC
-  while (!Serial);              // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
-
-  SPI.begin();                  // Init SPI bus
-
-  /* Initializing Inputs and Outputs */
-  pinMode(GreenLed, OUTPUT);
-  digitalWrite(GreenLed, LOW);
-  pinMode(relayIN, OUTPUT);
-  digitalWrite(relayIN, HIGH);
-  pinMode(RedLed, OUTPUT);
-  digitalWrite(RedLed, LOW);
-
-
-  /* looking for MFRC522 readers */
-  for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
-    mfrc522[reader].PCD_Init(ssPins[reader], RST_PIN);
-    Serial.print(F("Reader "));
-    Serial.print(reader);
-    Serial.print(F(": "));
-    mfrc522[reader].PCD_DumpVersionToSerial();
-    //mfrc522[reader].PCD_SetAntennaGain(mfrc522[reader].RxGain_max);
-  }
+  Serial.begin(9600);
+  SPI.begin();
+  
+  mfrc522_1.PCD_Init();
+  mfrc522_1.PCD_DumpVersionToSerial();
+  mfrc522_2.PCD_Init();
+  mfrc522_2.PCD_DumpVersionToSerial();
+  mfrc522_3.PCD_Init();
+  mfrc522_3.PCD_DumpVersionToSerial();
+  mfrc522_4.PCD_Init();
+  mfrc522_4.PCD_DumpVersionToSerial();
+  // mfrc522_5.PCD_Init();
+  // mfrc522_5.PCD_DumpVersionToSerial();
+  
 }
-
-/*
-   Main loop.
-*/
 
 void loop() {
+  // 检测模块1
+  if (mfrc522_1.PICC_IsNewCardPresent() && mfrc522_1.PICC_ReadCardSerial()) {
+    printCardSerial(mfrc522_1.uid);
+    delay(10); // 延迟0.01秒
+    mfrc522_1.PICC_HaltA();
+    mfrc522_1.PCD_StopCrypto1();
+  }
 
-  for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
-    // Looking for new cards
-    if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial()) {
-      Serial.print(F("Reader "));
-      Serial.print(reader);
-
-      // Show some details of the PICC (that is: the tag/card)
-      Serial.print(F(": Card UID:"));
-      String uid = dump_byte_array(mfrc522[reader].uid.uidByte, mfrc522[reader].uid.size);
-      Serial.println(uid);
-
-      /*Serial.print(F("PICC type: "));
-        MFRC522::PICC_Type piccType = mfrc522[reader].PICC_GetType(mfrc522[reader].uid.sak);
-        Serial.println(mfrc522[reader].PICC_GetTypeName(piccType));*/
-      // Halt PICC
-      mfrc522[reader].PICC_HaltA();
-      // Stop encryption on PCD
-      mfrc522[reader].PCD_StopCrypto1();
-    } //if (mfrc522[reader].PICC_IsNewC..
-  } //for(uint8_t reader..
+  // 检测模块2
+  if (mfrc522_2.PICC_IsNewCardPresent() && mfrc522_2.PICC_ReadCardSerial()) {
+    printCardSerial(mfrc522_2.uid);
+    delay(10); // 延迟0.01秒
+    mfrc522_2.PICC_HaltA();
+    mfrc522_2.PCD_StopCrypto1();
+  }
+  
+  // 检测模块3
+  if (mfrc522_3.PICC_IsNewCardPresent() && mfrc522_3.PICC_ReadCardSerial()) {
+    printCardSerial(mfrc522_3.uid);
+    delay(10); // 延迟0.01秒
+    mfrc522_3.PICC_HaltA();
+    mfrc522_3.PCD_StopCrypto1();
+  }
+  
+  // 检测模块4
+  if (mfrc522_4.PICC_IsNewCardPresent() && mfrc522_4.PICC_ReadCardSerial()) {
+    printCardSerial(mfrc522_4.uid);
+    delay(10); // 延迟0.01秒
+    mfrc522_4.PICC_HaltA();
+    mfrc522_4.PCD_StopCrypto1();
+  }
+  
+  // 检测模块5
+  // if (mfrc522_5.PICC_IsNewCardPresent() && mfrc522_5.PICC_ReadCardSerial()) {
+  //   printCardSerial(mfrc522_5.uid);
+  //   delay(10); // 延迟0.01秒
+  //   mfrc522_5.PICC_HaltA();
+  //   mfrc522_5.PCD_StopCrypto1();
+  // }
 }
 
-/**
-   Helper routine to dump a byte array as hex values to Serial.
-*/
-String dump_byte_array(byte * buffer, byte bufferSize) {
-    String uid;
-    for (byte i = 0; i < bufferSize; i++) {
-        uid += buffer[i] < 0x10 ? " 0" : " ";
-        uid += buffer[i], HEX;
-    }
-    return uid;
+void printCardSerial(MFRC522::Uid uid) {
+  // Serial.print("UID Value: ");
+  for (byte i = 0; i < uid.size; i++) {
+    Serial.print(uid.uidByte[i] < 0x10 ? " 0" : "");
+    Serial.print(uid.uidByte[i], HEX);
+  }
+  Serial.println();
 }
